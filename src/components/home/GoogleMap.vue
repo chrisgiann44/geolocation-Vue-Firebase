@@ -6,7 +6,6 @@
 
 <script>
 import firebase from "firebase";
-
 export default {
     name: "GoogleMap",
     data() {
@@ -19,7 +18,7 @@ export default {
         renderMap() {
             const map = new google.maps.Map(document.getElementById("map"), {
                 center: { lat: this.lat, lng: this.lng },
-                zoom: 5,
+                zoom: 7,
                 maxZoom: 15,
                 minZoom: 3,
                 streetViewControl: false
@@ -27,8 +26,27 @@ export default {
         }
     },
     mounted() {
-        console.log(firebase.auth().currentUser);
-        this.renderMap();
+        //get user geolocation info
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    this.lat = pos.coords.latitude;
+                    this.lng = pos.coords.longitude;
+                    this.renderMap();
+                },
+                err => {
+                    console.log(err);
+                    this.renderMap();
+                },
+                {
+                    maximumAge: 60000,
+                    timeout: 3000
+                }
+            );
+        } else {
+            // position center by default values
+            this.renderMap();
+        }
     }
 };
 </script>
