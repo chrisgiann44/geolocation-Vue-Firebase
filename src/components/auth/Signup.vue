@@ -25,7 +25,6 @@
 <script>
 import slugify from "slugify";
 import db from "@/firebase/init";
-
 import firebase from "firebase";
 
 export default {
@@ -58,6 +57,17 @@ export default {
                                 this.email,
                                 this.password
                             )
+                            .then(cred => {
+                                console.log(cred);
+                                ref.set({
+                                    alias: this.alias,
+                                    geolocation: null,
+                                    user_id: cred.user.uid
+                                });
+                            })
+                            .then(() => {
+                                this.$router.push({ name: "GoogleMap" });
+                            })
                             .then(() => (this.feedback = ""))
                             .catch(err => {
                                 console.log(err);
