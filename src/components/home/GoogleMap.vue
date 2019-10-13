@@ -6,6 +6,7 @@
 
 <script>
 import firebase from "firebase";
+import db from "@/firebase/init";
 export default {
     name: "GoogleMap",
     data() {
@@ -18,7 +19,7 @@ export default {
         renderMap() {
             const map = new google.maps.Map(document.getElementById("map"), {
                 center: { lat: this.lat, lng: this.lng },
-                zoom: 7,
+                zoom: 8,
                 maxZoom: 15,
                 minZoom: 3,
                 streetViewControl: false
@@ -26,13 +27,33 @@ export default {
         }
     },
     mounted() {
+        //get current user
+        let user = firebase.auth().currentUser;
         //get user geolocation info
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 pos => {
                     this.lat = pos.coords.latitude;
                     this.lng = pos.coords.longitude;
-                    this.renderMap();
+                    // find user record and update geocoords
+                    db.collection("users")
+                        .where("user_id", "==", user.uid)
+                        .get()
+                        .then(snapshot => {
+                            snapshot.forEach(element => {
+                                db.collection("users")
+                                    .doc(element.id)
+                                    .update({
+                                        geolocation: {
+                                            lat: pos.coords.latitude,
+                                            lng: pos.coords.longitude
+                                        }
+                                    });
+                            });
+                        })
+                        .then(() => {
+                            this.renderMap();
+                        });
                 },
                 err => {
                     console.log(err);
