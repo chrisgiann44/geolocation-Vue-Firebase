@@ -19,7 +19,7 @@ export default {
         renderMap() {
             const map = new google.maps.Map(document.getElementById("map"), {
                 center: { lat: this.lat, lng: this.lng },
-                zoom: 8,
+                zoom: 6,
                 maxZoom: 15,
                 minZoom: 3,
                 streetViewControl: false
@@ -40,7 +40,10 @@ export default {
                             });
                             // add click event to the marker
                             marker.addListener("click", () => {
-                                console.log(doc.id);
+                                this.$router.push({
+                                    name: "ViewProfile",
+                                    params: { id: doc.id }
+                                });
                             });
                         }
                     });
